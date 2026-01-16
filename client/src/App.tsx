@@ -23,7 +23,7 @@ type RoomState = {
   phase: 'waiting' | 'playing' | 'finished';
 };
 
-const socket: Socket = io('http://localhost:3001');
+const socket: Socket = io('https://ffp-h84o.onrender.com');
 
 function App() {
   const [roomId, setRoomId] = useState('');
@@ -297,3 +297,4 @@ function App() {
 }
 
 export default App;
+
