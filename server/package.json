@@ -1,6 +1,7 @@
 {
   "name": "card-game-server",
   "version": "1.0.0",
+  "start": "node index.js",
   "scripts": {
     "dev": "ts-node-dev src/index.ts"
   },
@@ -15,3 +16,4 @@
     "typescript": "^5.3.3"
   }
 }
+
