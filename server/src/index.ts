@@ -25,6 +25,7 @@ io.on('connection', socket => {
       hand: [],
       score: 0,
       currentDraw:1,
+      useSkip:false,
       next6:false,
       bonus:false
     });
@@ -75,3 +76,4 @@ io.on('connection', socket => {
 httpServer.listen(3001, () => {
   console.log('Server running on port 3001');
 });
+
