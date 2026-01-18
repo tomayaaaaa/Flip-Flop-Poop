@@ -23,7 +23,7 @@ type RoomState = {
   phase: 'waiting' | 'playing' | 'finished';
 };
 
-const socket: Socket = io('https://ffp-h84o.onrender.com');
+const socket: Socket = io('http://localhost:3001');
 
 function App() {
   const [roomId, setRoomId] = useState('');
@@ -159,6 +159,33 @@ function App() {
         </div>
     </>
       )}
+      {state.phase === 'playing' && state.isBonusActive && (
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: 6,
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: '#ff9800',
+            }}
+          >
+            🔥 次ターン2倍ドロー権 発動中!!
+          </div>
+      )}
+      {state.phase === 'playing' && state.isSkipActive && (
+        <div
+            style={{
+              textAlign: 'center',
+              marginTop: 6,
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: '#ff9800',
+            }}
+          >
+            🔥 {state.skipholder}がスキップ権を保有中!!
+          </div>
+      )}
+
       {/* ホストのみゲーム開始 */}
       {state.phase === 'waiting' && isHost && (
         <div style={{ textAlign: 'center', margin: '16px 0' }}>
@@ -297,4 +324,3 @@ function App() {
 }
 
 export default App;
-

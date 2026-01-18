@@ -1,6 +1,7 @@
 import { GameState, Player } from './GameState';
 import { Card } from './Card';
 import { createDeck } from './deck';
+import { platform } from 'os';
 
 export function createGame(roomId: string): GameState {
   return {
@@ -11,17 +12,23 @@ export function createGame(roomId: string): GameState {
     maxDraw: 3,
     phase: 'waiting',
     hostId: '',
-    losePlayer: ''
+    losePlayer: '',
+    isBonusActive: false,
+    isSkipActive: false,
+    skipholder: '',
   };
 }
 
 export function startGame(state: GameState) {
   state.deck = createDeck();
   state.phase = 'playing';
+  state.isBonusActive = false;
+  state.isSkipActive = false;
   for (let i = 0; i < state.players.length; i++) {
     state.players[i].currentDraw = 1;
     state.players[i].next6 = false;
     state.players[i].bonus = false;
+    state.players[i].useSkip = false;
   }
 }
 
@@ -40,7 +47,14 @@ export function drawCard(state: GameState, playerId: string) {
 
   if (card.value === 1 && card.suit === '♠') {
     player.bonus = true;
+    state.isBonusActive = true;
   }
+
+  if (card.suit == "♥" && card.value == 11){
+    state.skipholder = state.players[state.currentTurn].name;
+    state.isSkipActive = true;
+  }
+
   player.currentDraw ++;
 }
 
@@ -48,11 +62,32 @@ function getMaxDrawCount(player: Player): number {
   return player.next6 ? 6 : 3;
 }
 
+function hasSkipCard(player: Player): boolean{
+  return player.hand.some(
+    c => c.suit == "♥" && c.value == 11
+  );
+}
+
 export function endTurn(state: GameState) {
+  const activeplayer = state.players[state.currentTurn];
+
+  // 1枚もドローしていない状態
+  if(activeplayer.currentDraw == 1){
+    if(hasSkipCard(activeplayer) && !activeplayer.useSkip){
+      activeplayer.useSkip = true; //スキップ使用済みに設定
+      state.isSkipActive = false; //スキップ使用済みに設定
+      state.skipholder = ''; //スキップ使用済みに設定
+    }else{
+      // ターン終了させない
+      return;
+    }
+  }
+
   state.players[state.currentTurn].currentDraw = 1;
   if(true == state.players[state.currentTurn].next6){
     state.players[state.currentTurn].next6 = false;
     state.players[state.currentTurn].bonus = false;
+    state.isBonusActive = false;
   }
   if(true == state.players[state.currentTurn].bonus){
     state.players[state.currentTurn].next6 = true;
@@ -134,6 +169,8 @@ function endGame(state: GameState, loser: Player) {
       state.players[i].score += tmp_score[i] * 100;
     }
   }
+  state.isSkipActive = false; //スキップ使用済みに設定
+  state.skipholder = ''; //スキップ使用済みに設定
 }
 
 export function startNextGame(state: GameState) {
